@@ -1,0 +1,561 @@
+#
+# FCoreCore
+# Developed by _Poyebany
+#
+
+options:
+	tag: &6&lFCore &8»
+	title: &2&lFCore
+	subtitle: &aWITAMY
+	bctag: &8[&2&lUWAGA&8]
+
+on load:
+	set {wersja.twoja} to 1005
+	broadcast "&6&lFCore &aDeveloped by _Poyebany"
+	broadcast "&8(&bFCoreLoad&8) &bFunkcja OnLoad wykonana!"
+	broadcast "&8(&bFCoreLoad&8) &7Ustawiono wersje na &b%{wersja.twoja}%&7!"
+	if {toolid::*} is not set:
+		set {toolid::*} to 0
+
+# AKTUALIZACJA
+command /fupdate [<text>]:
+	description: Aktualizacja FCoreCore
+	trigger:
+		player has permission "poyebany.fupdate":
+			if arg 1 is not set:
+				set {wersja.nowa} to text from "https://raw.githubusercontent.com/LocK3rX/fcore/master/version"
+				send "&8(&bUpdate&8) &aTwoja wersja:&7 %{wersja.twoja}%"
+				send "&8(&bUpdate&8) &aNajnowsza wersja:&7 %{wersja.nowa}%"
+				send "&8(&bUpdate&8) &7Uzyj &b/fupdate update &7by zaktualizowac!"
+			if arg 1 is "update":
+				broadcast "&8(&bUpdate&8) &cUzytkownik rozpoczal aktualizacje! Mozliwy lag!"
+				broadcast "&8(&bUpdate&8) &cTo dlugo nie potrwa!"
+				delete file "plugins/Skript/scripts/core.sk"
+				download file from "https://raw.githubusercontent.com/LocK3rX/fcore/master/core.sk" to file "plugins/Skript/scripts/core.sk"
+				send "&8(&bUpdate&8) &aPobrano aktualizacje!"
+				broadcast "&8(&bUpdate&8) &aReloading Core! &7Moze byc lag!"
+				send "&8(&bUpdate&8) &cReloading FCoreCore!"
+				execute console command "sk reload core"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# AKTUALIZACJA
+
+# INSTALACJA SKRYPTOW
+command /finstall [<text>] [<text>] [<text>]:
+	description: Instaluje i usuwa skrypty
+	trigger:
+		player has permission "poyebany.finstall":
+			if arg 1 is not set:
+				send "&8(&bFInstall&8) &aFCoreCore -> FInstall"
+				send "&8(&bFInstall&8) &c/finstall &8- &aBasic command"
+				send "&8(&bFInstall&8) &c/finstall install [raw link] [name of new without .sk] &8- &aInstall a new skript"
+				send "&8(&bFInstall&8) &c/finstall uninstall [name without .sk] &8- &aUninstalls skript"
+			if arg 1 is "install":
+				if arg 2 is not set:
+					send "&8(&bFInstall&8) &cRaw Link can't be null or empty!"
+				if arg 3 is not set:
+					send "&8(&bFInstall&8) &cName can't be null or empty!"
+				if arg 2 is set:
+					if arg 3 is set:
+						send "&8(&bFInstall&8) &aDownloading from &c%arg 2% to &c%arg 3%"
+						send "&8(&bFInstall&8) &aPlease wait!"
+						download file from argument 2 to file "plugins/Skript/scripts/%arg 3%.sk"
+						send "&8(&bFInstall&8) &aDownloaded correctly!"
+						send "&8(&bFInstall&8) &aTo enable new skript use &c/sk reload [name]"
+			if arg 1 is "uninstall":
+				if arg 2 is not set:
+					send "&8(&bFInstall&8) &cName can't be null or empty!"
+				if arg 2 is set:
+					execute console command "sk disable %arg 2%"
+					send "&8(&bFInstall&8) &aSucessfully &cdisabled &a%arg 2%"
+					delete file "plugins/Skript/scripts/%arg 2%.sk"
+					send "&8(&bFInstall&8) &aSucessfully &cdeleted &a%arg 2%"
+		else:
+			send "{@tag} &cNie masz uprawnien!" 
+# INSTALACJA SKRYPTOW
+
+# CZAS GRY
+command /czasgry:
+	description: Wyswietla twoj czas gry
+	trigger:
+		send "{@tag} &eGrasz na naszym serwerze juz &6%{czas.%player%}% &eminut!"
+
+every 1 minute:
+	loop all players:
+		add 1 to {czas.%loop-player%}
+# CZAS GRY
+
+# MOTD
+on server list ping:
+	set motd to "&b%{ustawione.motd}%"
+command /ustawmotd [<text>]:
+	trigger:
+		player has permission "poyebany.setmotd":
+			if arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /ustawmotd [motd]"
+			if arg 1 is set:
+				set {ustawione.motd} to argument 1
+				send "{@tag} &aUstawiono motd na&b %arg 1%"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# MOTD
+
+# AUTO MESSAGE
+command /amsgrl:
+	description: Przeladuj automessage
+	trigger:
+		set {nrautomsg} to 1
+every 60 seconds:
+	if {nrautomsg} is not set:
+		set {nrautomsg} to 1
+	if {nrautomsg} is 1:
+		broadcast "{@tag} &7Znalazles buga? Zglos administracji!"
+		set {nrautomsg} to 2
+		stop
+	if {nrautomsg} is 2:
+		broadcast "{@tag} &aZyczymy milej gry na Ferajnie!"
+		set {nrautomsg} to 3
+		stop
+	if {nrautomsg} is 3:
+		broadcast "{@tag} &cDostepne komendy znajdziesz pod /pomoc!"
+		set {nrautomsg} to 1
+		stop
+# AUTO MESSAGE
+
+# ON JOIN QUIT
+on join:
+	set tab header to "&2&lFCore" and footer to "&7Milej Gry%nl%&7FCoreCore by _Poyebany" for player
+	add "%player%" to {allplayers::*}
+	set join message to "&8[&a+&8] &7%player%"
+	send player title "{@title}" with subtitle "{@subtitle}" for 5 seconds
+	send "{@tag}"
+	send "{@tag} &e&lWitamy na &2&lFerajnie&e!"
+	send "{@tag} &6Twoj nick:&7 %player%!"
+	send "{@tag} &6Czas:&7 %now%"
+	send "{@tag}"
+	if {wykopane::%player%} is not set:
+		set {wykopane::%player%} to 0
+
+on quit:
+	remove "%player%" from {allplayers::*}
+	set leave message to "&8[&c-&8] &7%player%"
+	delete {tpa::ocz::%player%}
+	delete {tpa::%player%}
+# ON JOIN QUIT
+
+# BROADCAST
+command /broadcast [<text>] [<text>]:
+	description: Wyslij wiadomosc serwera
+	aliases: bc
+	trigger:
+		player has permission "poyebany.broadcast":
+			if arg 1 is "czat":
+				if arg 2 is not set:
+					send "{@tag} &cPodaj wiadomosc!"
+				if arg 2 is set:
+					broadcast "{@bctag} &c%arg 1%"
+			if arg 1 is "title":
+				if arg 2 is not set:
+					send "{@tag} &cPodaj wiadomosc!"
+				if arg 2 is set:
+					loop all players:
+						send loop-player title "{@bctag}" with subtitle "&c%arg 2%" for 5 seconds
+			if arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /broadcast [czat/title] [wiadomosc]"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# BROADCAST
+
+# FORMATOWANIE CZATU
+on chat:
+	cancel event
+	if player is op:
+		broadcast "&8[&4&lOP&8] &c%player% &8» &7%message%"
+	else:
+		broadcast "&6%player% &8» &7%message%"
+# FORMATOWANIE CZATU
+
+# CLEAR CHAT
+command /cchat:
+	description: Wyczysc czat
+	trigger:
+		player has permission "poyebany.cchat":
+			loop 100 times:
+				send "" to all players
+			broadcast "{@tag} &eCzat zostal wyczyszczony!"
+			stop
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# CLEAR CHAT
+
+# MSG
+command /msg [<player>] [<text>]:
+	description: Wysyla prywatna wiadomosc
+	trigger:
+		if arg 1 is not set:
+			send "{@tag} &cPodaj gracza!"
+		if arg 1 is online:
+			if arg 2 is set:
+				send "&8(&6%player% &a-> &6%arg 1%&8) &e%arg 2%" to player
+				send "&8(&6%player% &a-> &6%arg 1%&8) &e%arg 2%" to player-arg
+			if arg 2 is not set:
+				send "{@tag} &cPodaj wiadomosc!"
+		else:
+			send "{@tag} &cNie mozesz wyslac wiadomosci do gracza offline!"
+# MSG
+
+# POMOC i TODO
+command /pomoc:
+	description: Pomoc dla graczy
+	trigger:
+		send "{@tag}"
+		send "{@tag} &6/sethome &8- &7Ustawia dom"
+		send "{@tag} &6/home &8- &7Teleportuje do domu"
+		send "{@tag} &6/msg &8- &7Wysyla prywatna wiadomosc"
+		send "{@tag} &6/tpa [gracz] &8- &7Wysyla prosbe o teleportacje"
+		send "{@tag} &6/smierci &8- &7Licznik smierci"
+		send "{@tag} &6/statystyki [gracz] &8- &7Statystyki gracza"
+		send "{@tag}"
+		send "{@tag} &7Korzystasz z &6&lFCore"
+command /help [<number>]:
+	description: FCoreCore default help
+	trigger:
+		if arg 1 is not set:
+			send "&a--> &aDefault help of FCoreCore"
+			send "&a--> &aPage &c1 &aof &c2"
+			send "&a- &c/time set [HH:MM] &a- &aSet time in world"
+			send "&a- &c/kick &a- &aKick a player"
+			send "&a- &c/gamemode [c/s/a] &a- &aSet your gamemode"
+			send "&a- &c/weather &a- &aSet a weather"
+			send "&a- &c/i [item] &a- &aTake item"
+			send "&a- &c/give [item] [player] &a- &aGive specific item to player"
+			send "&a- &c/tp [player] &a- &aTeleports you to player"
+			send "&a- &c/clear &a- &aClears your inventory"
+			send "&a- &c/broadcast [czat/title] &a- &aSend a broadcast message"
+			send "&a- &c/freload &a- &aReloads a FCoreCore"
+			send "&a--> &aUse &c/help2 &ato browse next page"
+		if arg 1 is 2:
+			send "&a--> &aDefault help of FCoreCore"
+			send "&a--> &aPage &c2 &aof &c2"
+			send "&a- &c/version &a- &aCheck version of FCoreCore"
+			send "&a- &c/fupdate &a- &aCheck update of FCoreCore"
+			send "&a- &c/finstall &a- &aInstall and uninstall new skripts"
+			send "&a- &c/ustawmotd [motd] &a- &aSet a motd (blue color)"
+			send "&a- &c/setlevel [xp] &a- &aSet your xp level"
+			send "&a- &c/cchat &a- &aClears a chat"
+command /todo:
+	description: To do in FCoreCore
+	trigger:
+		send "&6&lFCore&4&lCore &8» &eTo Do list:"
+		send "&6&lFCore&4&lCore &8» &5/ban"
+		send "&6&lFCore&4&lCore &8» &5/warp"
+		send "&6&lFCore&4&lCore &8» &5/motd"
+		send "&6&lFCore&4&lCore &8» &5Przeliczanie czasu gry na dni godziny minuty sekundy"
+# POMOC i TODO
+
+# RELOAD FCoreCORE
+command /freload:
+	description: Reload FCoreCore
+	trigger:
+		player has permission "poyebany.freload":
+			execute console command "sk reload core"
+			send "&8(&bFCoreLoad&8) &aPomyslnie przeladowano!"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# RELOAD FCoreCORE
+
+# VERSION
+command /version:
+	description: Version of FCoreCore
+	trigger:
+		send "&aYou are running on &c%{wersja.twoja}% &aversion!"
+command /minecraft:version:
+	description: Version of FCoreCore
+	trigger:
+		send "&aYou are running on &c%{wersja.twoja}% &aversion!"
+command /bukkit:version:
+	description: Version of FCoreCore
+	trigger:
+		send "&aYou are running on &c%{wersja.twoja}% &aversion!"
+# VERSION
+
+# WIADO O SMIERCIACH
+on death of player:
+    damage was caused by suffocation:
+        broadcast "{@tag} &c%victim% &7udusil sie w scianie!"
+    damage was caused by fall:
+        broadcast "{@tag} &c%victim% &7jednak nie umie latac!"
+    damage was caused by fire:
+        broadcast "{@tag} &c%victim% &7Usmazyl sie!"
+    damage was caused by burning:
+        broadcast "{@tag} &c%victim% &7Usmazyl sie!"
+    damage was caused by lava:
+        broadcast "{@tag} &c%victim% &7Usmazyl sie w glebokim oleju!"
+    damage was caused by drowning:
+        broadcast "{@tag} &c%victim% &7jednak nie jest ryba!"
+    damage was caused by entity explosion:
+        broadcast "{@tag} &c%victim% &7Zrobil boom!"
+    damage was caused by block explosion:
+        broadcast "{@tag} &c%victim% &7Zrobil boom!"
+    damage was caused by starvation:
+        broadcast "{@tag} &c%victim% &7Zaglodzil sie na smierc!"
+    damage was caused by poison:
+        broadcast "{@tag} &c%victim% &7Umarl z zatrucia!"
+    damage was caused by potion:
+        broadcast "{@tag} &c%victim% &7Umarl z zatrucia!"
+    damage was caused by falling block:
+        broadcast "{@tag} &c%victim% &7Zbyt mocno uderzyl sie w glowe!"
+    damage was caused by unknown:
+        broadcast "{@tag} &c%victim% &7Zginal!"
+# WIADO O SMIERCIACH
+
+# LICZNIK SMIERCI
+on death of player:
+	add 1 to {smierci.%player%}
+command /smierci:
+	description: Licznik smierci
+	executable by: players
+	trigger:
+		send "{@tag} &cZginales &7%{smierci.%player%}% &crazy!"
+# LICZNIK SMIERCI
+
+# CZYSZCZENIE EQ
+command /clear:
+	aliases: ci
+	description: Czysci ekwipunek
+	trigger:
+		player has permission "poyebany.clear":
+			send "{@tag} &aPomyslnie wyczysciles swoj ekwipunek!"
+			clear the player's inventory
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# CZYSZCZENIE EQ
+
+# HOMY
+command /sethome:
+	aliases: ustawdom
+	description: Ustawia dom
+	executable by: players
+	trigger:
+		set {homes.%player%.location} to location of player
+		send "{@tag} &aPomyslnie ustawiono swoj dom!"
+		send "{@tag} &aBy sie do niego spowrotem teleportowac uzyj &7/home"
+command /home:
+	aliases: dom
+	description: Teleportuje do domu
+	executable by: players
+	trigger:
+		if {homes.%player%.location} is not set:
+			send "{@tag} &cNie masz ustawionego domu!"
+			stop trigger
+		send "{@tag} &6Rozpoczynam teleportacje do domu!"
+		apply blindness 5 to the player for 15 second
+		apply nausea to the player for 15 second
+		send "{@tag} &6Zostaniesz teleportowany za &75 &6sekund!"
+		wait 5 seconds
+		remove nausea from player
+		remove blindness from player
+		teleport player to {homes.%player%.location}
+		send "{@tag} &aZostales teleportowany pomyslnie!"
+# HOMY
+
+# GAMEMODE
+command /gamemode [<text>]:
+	description: Ustawia gamemode
+	aliases: gm
+	executable by: players
+	trigger:
+		player has permission "poyebany.gm":
+			arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /gamemode [tryb]"
+				send "{@tag} &cDostepne tryby: c/s/a"
+			arg 1 is "1" or "c":
+				set the gamemode of player to creative
+				send "{@tag} &ePomyslnie ustawiles tryb &7kreatywny"
+			arg 1 is "2" or "s":
+				set the gamemode of player to survival
+				send "{@tag} &ePomyslnie ustawiles tryb &7przetrwania"
+			arg 1 is "3" or "a":
+				set the gamemode of player to adventure
+				send "{@tag} &ePomyslnie ustawiles tryb &7przygodowy"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# GAMEMODE
+
+# GIVE
+command /i [<items>]:
+	description: Daje ci przedmioty
+	executable by: players
+	trigger:
+		player has permission "poyebany.give":
+			arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /i [przedmiot]"
+			loop arguments:
+				give loop-item to player
+				send "{@tag} &eWziales sobie &7%arg 1%"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+command /give [<item types>] [<player>]:
+	description: Daje komus przedmioty
+	trigger:
+		player has permission "poyebany.give":
+			send "{@tag} &eDales &7%arg 1% &edla &7%arg 2%" to player
+			loop argument 1:
+				give loop-item to argument 2
+				send "{@tag} &eOtrzymano &7%loop-item% &eod &7%player%" to argument 2
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# GIVE
+
+# TP
+command /tp [<player>]:
+	description: Teleportuje do gracza
+	trigger:
+		player has permission "poyebany.tp":
+			arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /tp [gracz]"
+			arg 1 is set:
+				send "{@tag} &aTeleportuje do &7%arg 1%"
+				teleport player to argument 1
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# TP
+
+# TPA
+command /tpa [<player>]:
+	description: Wysyla prosbe o teleportacje
+	trigger:
+		if arg 1 is not set:
+			send "{@tag} &cPoprawne uzycie: /tpa [gracz]"
+			stop
+		if arg 1 is online:
+			delete {tpa::%player%}
+			delete {tpa::ocz::%player-arg%}
+			set {tpa::%player%} to "%player-arg%"
+			set {tpa::ocz::%player-arg%} to "%player%"
+			send "{@tag} &aPomyslnie wyslales prosbe o teleportacje do &7%arg 1%&a." to player
+			send "{@tag} &eGracz &7%player% &echce sie do ciebie teleportowac!" to player-arg
+			send "{@tag} &eUzyj &a/akceptujtp &eby zaakceptowac!" to player-arg
+			send "{@tag} &eUzyj &c/odrzuctp &eby odrzucic!" to player-arg
+			stop
+
+command /odrzuctp:
+	description: Odrzuca prosbe o teleportacje
+	trigger:
+		if {tpa::ocz::%player%} is set:
+			set {_} to "%{tpa::ocz::%player%}%" parsed as player
+			delete {tpa::ocz::%player%}
+			delete {tpa::%{_}%}
+			send "{@tag} &cGracz &7%player% &cnie zaakceptowal twojej prosby!" to {_}
+			send "{@tag} &eNie zaakceptowales prosby gracza &7%{tpa::ocz::%player%}%&e!" to player
+		else:
+			send "{@tag} &cNie masz oczekujacej prosby!"
+
+command /akceptujtp:
+	description: Akceptuje prosbe o teleportacje
+	trigger:
+		if {tpa::ocz::%player%} is set:
+			set {_} to "%{tpa::ocz::%player%}%" parsed as player
+			send "{@tag} &ePrzeteleportowano &7%{tpa::ocz::%player%}% &e do ciebie!" to player
+			send "{@tag} &aGracz &7%player% &azaakceptowal twoja prosbe!" to {_}
+			send "{@tag} &aZostaniesz teleportowany za &75 sekund&a!" to {_}
+			apply blindness 5 to {_} for 15 second
+			apply nausea to {_} for 15 second
+			wait 5 seconds
+			remove nausea from {_}
+			remove blindness from {_}
+			delete {tpa::%{_}%}
+			delete {tpa::ocz::%player%}
+			teleport {_} to player
+		else:
+			send "{@tag} &cNie masz oczekujacej prosby!"
+# TPA
+
+# KICK
+command /kick [<player>]:
+	description: Wyrzuca gracza z serwera
+	trigger:
+		player has permission "poyebany.kick":
+			send "{@tag} &aWyrzuciles &7%arg 1% &az serwera!"
+			kick argument 1 due to "&cZostales wyrzucony z serwera!"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# KICK
+
+# DAWANIE SOBIE LVL
+command /setlevel [<number>]:
+	description: Ustawia poziom doswiadczenia
+	trigger:
+		player has permission "poyebany.setlevel":
+			if arg 1 is set:
+				set player's level to argument 1
+				send "{@tag} &eUstawiles swoj level na &7%arg 1%"
+			if arg 1 is not set:
+				send "{@tag} &cPodaj level!"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# DAWANIE SOBIE LVL
+
+# BLOKADY
+command /title:
+	description: Komenda wylaczona
+	trigger:
+		send "{@tag} &cUzyj /broadcast"
+command /xp:
+	description: Komenda wylaczona
+	trigger:
+		send "{@tag} &cUzyj /setlevel"
+# BLOKADY
+
+# STATY
+on break:
+	add 1 to {wykopane::%player%}
+	if player is holding pickaxe:
+		set lore of player's tool to "&eWlasciciel: &6%player% &8(&eWykopane bloki: &6%{wykopane::%player%}%&8)"
+on break of diamond ore:
+    add 1 to {diamenty::%player%}
+command /statystyki [<text>]:
+	description: Ile ktos wykopal kamienia
+	trigger:
+		if arg 1 is set:
+			send "{@tag}"
+			send "{@tag} &e====[] &6&lStatystyki &e[]===="
+			send "{@tag} &eGracz: &7%arg 1%"
+			send "{@tag} &eWykopane bloki: &7%{wykopane::%arg 1%}%"
+			send "{@tag} &eWykopane diamenty: &7%{diamenty::%arg 1%}%"
+			send "{@tag} &eSmierci: &7%{smierci.%arg 1%}%"
+			send "{@tag} &e====[] &6&lStatystyki &e[]===="
+			send "{@tag}"
+		if arg 1 is not set:
+			send "{@tag} &cPodaj nick gracza!"
+# STATY
+
+# VANISH
+command /vanish:
+	description: Wlacz lub wylacz vanisha
+	aliases: /v, /niewidzialnosc
+	trigger:
+		player has permission "poyebany.vanish":
+			if {vanish.%player%} is false:
+				hide player to all players
+				send "{@tag} &aWlaczono vanisha!"
+				set {vanish.%player%} to true
+			else:
+				reveal player to all players
+				send "{@tag} &cWylaczono vanisha!"
+				set {vanish.%player%} to false
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# VANISH
+
+# PODSZYWANIE
+command /podszyj [<text>] [<text>] [<text>]:
+	description: Podszyj sie
+	trigger:
+		if arg 1 is not set:
+			send "{@tag} &cPoprawne uzycie: /podszyj [gracz/op] [gracz] [wiadomosc]"
+		if arg 1 is "op":
+			broadcast "&8[&4&lOP&8] &c%arg 2% &8» &7%arg 3%"
+		if arg 1 is "gracz":
+			broadcast "&6%arg 2% &8» &7%arg 3%"
+# PODSZYWANIE
