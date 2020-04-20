@@ -1,0 +1,405 @@
+options:
+	tag: &5Ferajna &8»
+
+variables:
+	{smierci.%player%} = 0
+	{ban.%player%} = false
+
+on script load:
+	if folder "plugins/Skript/scripts/Bany" doesn't exists:
+		create folder "plugins/Skript/scripts/Bany"
+
+# banowanie
+command /ban [<player>]:
+	description: Banuje gracza online
+	trigger:
+		player has permission "poyebany.ban":
+			if arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /ban [gracz]"
+			if arg 1 is set:
+				if file "plugins/Skript/scripts/Bany/%arg 1%.yml" exists:
+					send "{@tag} &cTen gracz juz ma bana!"
+				if file "plugins/Skript/scripts/Bany/%arg 1%.yml" doesn't exists:
+					kick argument 1 due to "&4ZOSTALES ZBANOWANY"
+					create file "plugins/Skript/scripts/Bany/%arg 1%.yml"
+					broadcast "{@tag} &4&lBAN! &cGracz &4%arg 1% &czostal zbanowany!"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+command /offlineban [<offlineplayer>]:
+	description: Banuje gracza offline
+	trigger:
+		player has permission "poyebany.ban":
+			if arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /ban [gracz]"
+			if arg 1 is set:
+				if file "plugins/Skript/scripts/Bany/%arg 1%.yml" exists:
+					send "{@tag} &cTen gracz juz ma bana!"
+				if file "plugins/Skript/scripts/Bany/%arg 1%.yml" doesn't exists:
+					create file "plugins/Skript/scripts/Bany/%arg 1%.yml"
+					broadcast "{@tag} &4&lBAN! &cGracz &4%arg 1% &czostal zbanowany!"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+command /unban [<offlineplayer>]:
+	description: Daje UNBANA
+	trigger:
+		player has permission "poyebany.ban":
+			if arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /unban [gracz]"
+			if arg 1 is set:
+				if file "plugins/Skript/scripts/Bany/%arg 1%.yml" exists:
+					delete file "plugins/Skript/scripts/Bany/%arg 1%.yml"
+					send "{@tag} &aPomyslnie odbanowano &7%arg 1%"
+			if file "plugins/Skript/scripts/Bany/%arg 1%.yml" doesn't exists:
+				send "{@tag} &cTen gracz nie jest zbanowany!"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# banowanie
+
+# pomoc
+command /help:
+	description: Help
+	trigger:
+		player has permission "poyebany.help":
+			send "&c&lFerajna Admin Help"
+			send "&c/ban [player] - Bans a player"
+			send "&c/offlineban [player] - Bans a offline player"
+			send "&c/unban [player] - Unbans a player"
+			send "&c/kick [player] - Kicks a player"
+			send "&c/weather [sunny/rainy] - Set weather"
+			send "&c/time set [HH:MM] - Set time"
+			send "&c/gamemode [c/s/a] - Set player's gamemode"
+			send "&c/i [item] - Take item"
+			send "&c/give [item] [player] - Give specific item to player"
+			send "&c/tp [player] - Teleports you to player"
+			send "&c/clear - Clears your inventory"
+			send "&r"
+			send "&7FerajnaCore 1.0.0 by _Poyebany"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+command /pomoc:
+	description: Pomoc dla graczy
+	trigger:
+		send "&e&m----------&r &5POMOC&e &m----------"
+		send "&6/bazary &8- &5Pomoc na temat bazarow"
+		send "&6/msg &8- &5Wysyla prywatna wiadomosc"
+		send "&6/kasa &8- &5Sprawdza stan konta"
+		send "&6/sethome &8- &5Ustawia dom"
+		send "&6/fcinfo &8- &5Informacje o &7FerajnaCore"
+		send "&e&m----------&r &5POMOC&e &m----------"
+command /fcinfo:
+	description: FerajnaCore information
+	trigger:
+		send "&7-<>-<>-<>-<>-<>-<>-<>-"
+		send "&5&lFerajna&7&lCore &f1.0.0"
+		send "&7Develeoped by: &e_Poyebany"
+		send "&7Version: preRelease 1.0.0"
+		send "&7Public? preRelease is not public!"
+		send "&7Report bugs to the administrators!"
+		send "&7-<>-<>-<>-<>-<>-<>-<>-"
+command /version:
+	description: Version information
+	trigger:
+		send "&a***** &eVERSION &a*****"
+		send "&7Server is running on &5&lFerajna&7&lCore &7with version &e1.0.0"
+		send "&7This is the &c<null> &7version of core!"
+		send "&a***** &eVERSION &a*****"
+# pomoc
+
+on join:
+	set join message to "&8[&5+&8] %player%"
+	send player title "&5&lFerajna" with subtitle "&a&lWitaj!" for 5 seconds
+	send "{@tag} -=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+	send "{@tag} &5&lFerajna&7&lCore &f1.0.0"
+	send "{@tag} &5Witamy %player%!"
+	send "{@tag} &6Stan konta: &e/kasa"
+	send "{@tag} -=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+	if file "plugins/Skript/scripts/Bany/%player%.yml" exists:
+		wait 1 tick
+		kick player due to "&cJestes zbanowany na ferajnie!"
+
+on quit:
+	set leave message to "&8[&c-&8] %player%"
+
+# smierci
+on death of player:
+	add 1 to {smierci.%player%}
+command /smierci:
+	description: Licznik smierci
+	executable by: players
+	trigger:
+		send "{@tag} &eZginales &6%{smierci.%player%}% &erazy"
+# smierci
+
+# sethome
+command /sethome:
+	description: Ustawia dom
+	executable by: players
+	trigger:
+		set {homes.%player%.location} to location of player
+		send "{@tag} &aPomyslnie ustawiono dom!"
+command /home:
+	description: Teleportuje do domu
+	executable by: players
+	trigger:
+		if {homes.%player%.location} is not set:
+			send "{@tag} &cNie masz ustawionego domu!"
+			stop trigger
+		send "{@tag} &eRozpoczynam teleportacje!"
+		send "{@tag} &eZostaniesz teleportowany za 5 sekund!"
+		wait 5 seconds
+		teleport player to {homes.%player%.location}
+		send "{@tag} &aTeleportowano pomyslnie!"
+# sethome
+
+# chat
+on chat:
+	cancel event
+	broadcast "&8(&6%player%&8) &7%message%"
+# chat
+
+# gamemode
+command /gamemode [<text>]:
+	description: Ustawia gamemode
+	aliases: gm
+	executable by: players
+	trigger:
+		player has permission "poyebany.gm":
+			arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /gamemode [tryb]"
+				send "{@tag} &cDostepne tryby: c/s/a"
+			arg 1 is "1" or "c":
+				set the gamemode of player to creative
+				send "{@tag} &aPomyslnie ustawiles tryb &7kreatywny"
+			arg 1 is "2" or "s":
+				set the gamemode of player to survival
+				send "{@tag} &aPomyslnie ustawiles tryb &7przetrwania"
+			arg 1 is "3" or "a":
+				set the gamemode of player to adventure
+				send "{@tag} &aPomyslnie ustawiles tryb &7przygodowy"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# gamemode
+
+# give
+command /i [<items>]:
+	description: Daje ci przedmioty
+	executable by: players
+	trigger:
+		player has permission "poyebany.give":
+			arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /i [przedmiot]"
+			loop arguments:
+				give loop-item to player
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+command /give [<item types>] [<player>]:
+	description: Daje komus przedmioty
+	trigger:
+		player has permission "poyebany.give":
+			send "{@tag} &eDales &6%argument 1% &edla &6%argument 2%" to player
+			loop argument 1:
+				give loop-item to argument 2
+				send "{@tag} &eOtrzymano &6%loop-item% &eod &6%player%" to argument 2
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# give
+
+# tp
+command /tp [<player>]:
+	description: Teleportuje do gracza
+	trigger:
+		player has permission "poyebany.tp":
+			arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /tp [gracz]"
+			arg 1 is set:
+				send "{@tag} &aTeleportuje do &7%arg 1%"
+				teleport player to argument 1
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# tp
+
+# kick
+command /kick [<player>]:
+	description: Wyrzuca gracza
+	trigger:
+		player has permission "poyebany.kick":
+			send "{@tag} &aWyrzuciles &7%arg 1% &az serwera!"
+			kick argument 1 due to "&cZostales wyrzucony z serwera!"
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# kick
+
+# time
+command /time set [<time>]:
+	aliases: ts
+	description: Zmienia czas w grze
+	trigger:
+		player has permission "poyebany.timeset":
+			arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /time set HH:MM"
+			arg 1 is set:
+				send "{@tag} &aPomyslnie zmieniles czas na &7%arg 1%&a!"
+				set time to argument 1
+			else:
+				send "{@tag} &cNie masz uprawnien!"
+# time
+
+# weather
+command /weather [<text>]:
+	description: Ustawia pogode
+	trigger:
+		player has permission "poyebany.weather":
+			arg 1 is not set:
+				send "{@tag} &cPoprawne uzycie: /weather sloneczna/deszczowa/clear"
+			arg 1 is "sunny" or "sloneczna" or "clear":
+				send "{@tag} &aPomyslnie zmieniles pogode na &7sloneczna&a!"
+				set the weather in player's world to clear
+			arg 1 is "rainy" or "deszczowa":
+				send "{@tag} &aPomyslnie zmieniles pogode na &7deszczowa&a!"
+				set the weather in player's world to rainy
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# weather
+
+# clear
+command /clear:
+	aliases: ci
+	description: Czysci ekwipunek
+	trigger:
+		player has permission "poyebany.clear":
+			send "{@tag} &aPomyslnie wyczysciles swoj ekwipunek!"
+			clear the player's inventory
+		else:
+			send "{@tag} &cNie masz uprawnien!"
+# clear
+
+# blokady
+command /xp:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cCooo? Chcialo by ci sie expa nabijac komendami lamusku!"
+command /achievement:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cOsiagniecia zdobadz recznie czituszku!"
+command /ban-ip:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cNie umialem zrobic ban ip :c"
+command /banlist:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cBany w folderze Bany w Skript/skripts"
+command /blockdata:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cTa komenda jest wylaczona!"
+command /clone:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cTa komenda jest wylaczona!"
+command /defaultgamemode:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cTa komenda jest wylaczona!"
+command /effect:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cSorry man! Silki 50 tez sb nie wezmiesz :D"
+command /enchant:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cNo robi sie go z obsa,diamentu i ksiazki!"
+command /entitydata:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cEntiti dejta XD"
+command /execute:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cTa komenda jest wylaczona!"
+command /fill:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cWypelniarka niestety nie dziala!"
+command /list:
+	description: Wylaczone
+	trigger:
+		send "{@tag} &cTo se taba wcisnij XD"
+command /me:
+	description: Wylaczone
+	trigger:
+		send "{@tag} %player%"
+command /minecraft:help:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /minecraft:tell:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /pardon:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Uzyj /unban haha"
+command /pardon-ip:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Nie ma banow na ajpi XD"
+command /particle:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Tez uwazam ze sa fajne"
+command /playsound:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /plugins:
+	description: Wylaczone
+	trigger:
+		send "&aPlugins: &fFerajnaCore"
+command /bukkit:plugins:
+	description: Wylaczone
+	trigger:
+		send "&aPlugins: &fFerajnaCore"
+command /bukkit:pl:
+	description: Wylaczone
+	trigger:
+		send "&aPlugins: &fFerajnaCore"
+command /pl:
+	description: Wylaczone
+	trigger:
+		send "&aPlugins: &fFerajnaCore"
+command /restart:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /summon:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /stats:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /tell:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /tellraw:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /title:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+command /toggledownfall:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Uzyj /weather"
+command /trigger:
+	description: Wylaczone
+	trigger:
+		send "{@tag} Ta komenda jest wylaczona"
+# blokady
