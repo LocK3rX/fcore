@@ -182,16 +182,11 @@ on chat:
 	cancel event
 	if player is op:
 		if player is not "_Poyebany":
-			broadcast "&8[&6LVL &e%{lvl.%player%}%&8] &8[&4&lOP&8] &c%player% &8» &7%message%"
+			broadcast "&8[&6LVL &e%{fCore::level::%player%}%&8] &8[&4&lOP&8] &c%player's display name% &8» &7%message%"
 		if player is "_Poyebany":
-			broadcast "&8[&6LVL &e%{lvl.%player%}%&8] &8[&b&lDEV&8] &4&l_&f&lPoye&4&lbany &8» &a%message%"
+			broadcast "&8[&6LVL &e%{fCore::level::%player%}%&8] &8[&b&lDEV&8] &b&l%player's display name% &8» &a%message%"
 	else:
-		if player is not "Kubix" or "arvzek":
-			broadcast "&8[&6LVL &e%{lvl.%player%}%&8] &6%player% &8» &7%message%"
-		if player is "Kubix":
-			broadcast "&8[&6LVL &e%{lvl.%player%}%&8] &8&lKub&4&lix &8» &7%message%"
-		if player is "arvzek":
-			broadcast "&8[&6LVL &e%{lvl.%player%}%&8] &b&larvzek &8» &7%message%"
+		broadcast "&8[&6LVL &e%{fCore::level::%player%}%&8] &6%player's display name% &8» &7%message%"
 		
 # FORMATOWANIE CZATU
 
